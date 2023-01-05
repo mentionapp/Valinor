@@ -83,7 +83,8 @@ final class ArgumentsValues implements IteratorAggregate
             if (! is_array($value) || ! array_key_exists($argument->name(), $value)) {
                 return [$argument->name() => $value];
             } elseif (count($value) === 1) {
-                $isValid = false;
+                // https://github.com/CuyZ/Valinor/issues/269
+                // $isValid = false;
             }
         }
 
