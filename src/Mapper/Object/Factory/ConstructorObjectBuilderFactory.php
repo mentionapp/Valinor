@@ -18,9 +18,12 @@ use CuyZ\Valinor\Mapper\Object\NativeConstructorObjectBuilder;
 use CuyZ\Valinor\Mapper\Object\ObjectBuilder;
 use CuyZ\Valinor\Type\Types\ClassStringType;
 use CuyZ\Valinor\Type\Types\ClassType;
+use CuyZ\Valinor\Type\Types\EnumValueType;
 use CuyZ\Valinor\Type\Types\InterfaceType;
+use CuyZ\Valinor\Type\Types\NativeEnumType;
 use CuyZ\Valinor\Type\Types\NativeStringType;
 
+use Doctrine\DBAL\Types\ObjectType;
 use function array_key_exists;
 use function count;
 
@@ -93,7 +96,10 @@ final class ConstructorObjectBuilderFactory implements ObjectBuilderFactory
         $parameters = $definition->parameters();
         $returnType = $definition->returnType();
 
-        if (! $returnType instanceof ClassType && ! $returnType instanceof InterfaceType) {
+        if (
+            ! $returnType instanceof ClassType && ! $returnType instanceof InterfaceType &&
+            ! $returnType instanceof NativeEnumType && ! $returnType instanceof EnumValueType
+        ) {
             throw new InvalidConstructorReturnType($definition);
         }
 
