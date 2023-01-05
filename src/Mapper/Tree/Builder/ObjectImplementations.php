@@ -14,12 +14,16 @@ use CuyZ\Valinor\Mapper\Tree\Exception\ObjectImplementationNotRegistered;
 use CuyZ\Valinor\Mapper\Tree\Exception\ResolvedImplementationIsNotAccepted;
 use CuyZ\Valinor\Type\Parser\Exception\InvalidType;
 use CuyZ\Valinor\Type\Parser\TypeParser;
+use CuyZ\Valinor\Type\StringType;
 use CuyZ\Valinor\Type\Type;
 use CuyZ\Valinor\Type\Types\ClassStringType;
 use CuyZ\Valinor\Type\Types\ClassType;
 use CuyZ\Valinor\Type\Types\InterfaceType;
+use CuyZ\Valinor\Type\Types\StringValueType;
 use CuyZ\Valinor\Type\Types\UnionType;
+use Doctrine\DBAL\Types\ObjectType;
 use Exception;
+use Mention\DomainBase\Event\EventInterface;
 
 /** @internal */
 final class ObjectImplementations
@@ -133,6 +137,22 @@ final class ObjectImplementations
         $classes = [];
 
         foreach ($types as $type) {
+            if ($type instanceof StringValueType) {
+                try {
+                    $stringAsType = $this->typeParser->parse($type->value());
+                } catch (InvalidType $e) {
+                    return [];
+                }
+
+                if (! $stringAsType instanceof ClassType) {
+                    return [];
+                }
+
+                $classes[$stringAsType->toString()] = $stringAsType;
+
+                continue;
+            }
+
             if (! $type instanceof ClassStringType) {
                 return [];
             }
